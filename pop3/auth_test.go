@@ -30,7 +30,28 @@ func TestIsAuthFalse(t *testing.T) {
 
 func TestConnect(t *testing.T) {
 	addr := "mail.btopenworld.com:110"
-	pop, err := Connect(addr)
+	pop, err := Connect(addr, nil, false)
+
+	if pop.Conn == nil {
+		t.Errorf("c.Conn is nil.")
+	}
+
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !pop.IsAuthorized {
+		t.Errorf("Expected: %v, got: %v", true, pop.IsAuthorized)
+	}
+
+	if pop.Addr != addr {
+		t.Errorf("Expected: %s, got: %s", addr, pop.Addr)
+	}
+}
+
+func TestConnectTLS(t *testing.T) {
+	addr := "mail.btopenworld.com:995"
+	pop, err := Connect(addr, nil, true)
 
 	if pop.Conn == nil {
 		t.Errorf("c.Conn is nil.")
@@ -51,7 +72,7 @@ func TestConnect(t *testing.T) {
 
 func TestClient_Quit(t *testing.T) {
 	addr := "mail.btopenworld.com:110"
-	pop, err := Connect(addr)
+	pop, err := Connect(addr, nil, false)
 
 	if pop.Conn == nil {
 		t.Errorf("c.Conn is nil.")

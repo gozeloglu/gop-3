@@ -1,6 +1,7 @@
 package pop3
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
@@ -23,6 +24,9 @@ type Client struct {
 
 	// IsAuthorized keeps status of AUTHORIZATION state.
 	IsAuthorized bool
+
+	// IsEncrypted stands for whether mail server encrypted with TLS.
+	IsEncrypted bool
 }
 
 const (
@@ -41,21 +45,51 @@ const (
 // host and port number.
 // POP3 default port: 110
 // POP3 (with TLS) default port: 995
-func Connect(addr string) (Client, error) {
-	return connectPOP3(addr)
+func Connect(addr string, tlsConf *tls.Config, isEncryptedTLS bool) (Client, error) {
+	if isEncryptedTLS {
+		return connectPOP3TLS(addr, tlsConf)
+	}
+	return connectPOP3(addr, tlsConf, isEncryptedTLS)
+}
+
+func connectPOP3TLS(addr string, config *tls.Config) (Client, error) {
+	c := &Client{
+		Conn:         nil,
+		Addr:         "",
+		GreetingMsg:  "",
+		IsAuthorized: false,
+		IsEncrypted:  true,
+	}
+
+	tlsConn, err := tls.Dial("tcp", addr, config)
+	if err != nil {
+		log.Println(err)
+		return *c, err
+	}
+	c.Conn = tlsConn
+	c.Addr = addr
+
+	err = c.readGreetingMsg()
+	if err != nil {
+		log.Println(err)
+		return Client{}, err
+	}
+	return *c, nil
 }
 
 // connectPOP3 connects to given address and returns
 // a POP3 Client. This function is implementation of
 // Connect() function. Reads server's response sending
 // after connecting POP3 server.
-func connectPOP3(addr string) (Client, error) {
+func connectPOP3(addr string, config *tls.Config, isEncryptedTLS bool) (Client, error) {
 	c := &Client{
 		Conn:         nil,
 		Addr:         "",
 		GreetingMsg:  "",
 		IsAuthorized: false,
+		IsEncrypted:  false,
 	}
+
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
 		log.Println(err)
