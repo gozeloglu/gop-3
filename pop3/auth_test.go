@@ -7,7 +7,7 @@ import (
 
 var (
 	c    = Client{}
-	quit = "QUIT"
+	ok = "+OK"
 )
 
 func TestIsAuth(t *testing.T) {
@@ -87,11 +87,33 @@ func TestClient_Quit(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if c.IsAuthorized != false {
-		t.Errorf("Expected c.IsAuthorized %v, got: %v", false, c.IsAuthorized)
+	if pop.IsAuthorized != false {
+		t.Errorf("Expected c.IsAuthorized %v, got: %v", false, pop.IsAuthorized)
 	}
 
-	if !strings.Contains(got, quit) {
-		t.Errorf("expected %s, got %s", quit, got)
+	if !strings.Contains(got, ok) {
+		t.Errorf("expected %s, got %s", ok, got)
+	}
+}
+
+func TestClientTLS_Quit(t *testing.T) {
+	addr := "mail.btopenworld.com:995"
+	popTLS, err := Connect(addr, nil, true)
+
+	if popTLS.Conn == nil {
+		t.Errorf(err.Error())
+	}
+
+	got, err := popTLS.Quit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if popTLS.IsAuthorized != false {
+		t.Errorf("expected popTLS.IsAuthorized: %v, got: %v", false, popTLS.IsAuthorized)
+	}
+
+	if !strings.Contains(got, ok) {
+		t.Errorf("expected: %s, got: %s", ok, got)
 	}
 }

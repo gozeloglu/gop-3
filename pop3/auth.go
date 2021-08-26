@@ -35,6 +35,8 @@ const (
 
 	// ERR is unsuccessful server response's prefix
 	ERR = "-ERR"
+
+	QUIT = "QUIT"
 )
 
 // Connect create and make a connection with POP3
@@ -178,24 +180,28 @@ func (c *Client) Quit() (string, error) {
 // server. Closes Conn if server response
 // contains "+OK".
 func (c *Client) quit() (string, error) {
-	buf := []byte("QUIT\r\n")
-	w, err := c.Conn.Write(buf)
+	err := c.sendQuitCmd()
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
-	resp := string(buf[:w])
+	// Read the response message that comes
+	// from the server.
+	qResp, err := c.readQuitResp()
+	if err != nil {
+		return "", err
+	}
 
 	// Close the connection and change the
 	// state of the client.
-	if isQuit(resp) {
+	if isQuit(qResp) {
 		defer c.Conn.Close()
 		defer c.changeClientState()
+		log.Println(c.IsAuthorized)
+		log.Println(c.Addr)
 	}
 
-	log.Println(resp)
-	return resp, nil
+	return qResp, nil
 }
 
 // isQuit checks the server response after
@@ -207,6 +213,38 @@ func (c *Client) quit() (string, error) {
 // after QUIT command.
 func isQuit(resp string) bool {
 	return strings.HasPrefix(resp, OK)
+}
+
+// sendQuitCmd sends the QUIT command to server
+// as a client. The command ends with CRLF(\r\n).
+// It indicates that command is terminated.
+// The function returns error if occurs while
+// sending command.
+func (c Client) sendQuitCmd() error {
+	buf := []byte("QUIT\r\n")
+	_, err := c.Conn.Write(buf)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+// readQuitResp reads the response message that comes
+// from the server after sending QUIT command. If
+// QUIT is done successfully, the server sends a response
+// which starts with "+OK". Returns the response msg and
+// error if occurs.
+func (c *Client) readQuitResp() (string, error) {
+	var buf [512]byte
+	r, err := c.Conn.Read(buf[:])
+	if err != nil {
+		log.Printf(err.Error())
+		return "", err
+	}
+	resp := string(buf[:r])
+	log.Println(resp)
+	return resp, nil
 }
 
 // changeClientState changes the client's state
