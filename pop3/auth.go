@@ -45,13 +45,24 @@ const (
 // host and port number.
 // POP3 default port: 110
 // POP3 (with TLS) default port: 995
+// tlsConf *tls.Config - TLS configuration for POP3 servers.
+// You can pass <nil> if there is no configuration.
+// isEncryptedTLS bool - Indicates that POP3 server whether
+// is encrypted. You can pass false the server is not
+// encrypted.
 func Connect(addr string, tlsConf *tls.Config, isEncryptedTLS bool) (Client, error) {
 	if isEncryptedTLS {
 		return connectPOP3TLS(addr, tlsConf)
 	}
-	return connectPOP3(addr, tlsConf, isEncryptedTLS)
+	return connectPOP3(addr)
 }
 
+// connectPOP3TLS connects to given address and returns
+// a POP3 (encrypted with TLS) Client. This function is specialized
+// for TLS encrypted POP3 servers (995 port).
+//
+// addr string - POP3 server address.
+// config *tls.Config -  TLS configuration for POP3 server.
 func connectPOP3TLS(addr string, config *tls.Config) (Client, error) {
 	c := &Client{
 		Conn:         nil,
@@ -81,7 +92,7 @@ func connectPOP3TLS(addr string, config *tls.Config) (Client, error) {
 // a POP3 Client. This function is implementation of
 // Connect() function. Reads server's response sending
 // after connecting POP3 server.
-func connectPOP3(addr string, config *tls.Config, isEncryptedTLS bool) (Client, error) {
+func connectPOP3(addr string) (Client, error) {
 	c := &Client{
 		Conn:         nil,
 		Addr:         "",
