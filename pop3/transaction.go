@@ -32,7 +32,7 @@ func (c *Client) stat() (string, error) {
 		return "", err
 	}
 
-	resp, err := c.readStatResp()
+	resp, err := c.readResp()
 	if err != nil {
 		log.Println(err)
 		return "", err
@@ -54,12 +54,12 @@ func (c *Client) sendStatCmd() error {
 	return nil
 }
 
-// readStatResp reads the STAT command's response.
+// readResp reads the command's response.
 // It allocates a byte array with size of 512 byte.
 // Read and store the response into buf array.
 // Finally, the byte array converts to string and
 // return.
-func (c *Client) readStatResp() (string, error) {
+func (c *Client) readResp() (string, error) {
 	var buf [512]byte
 	r, err := c.Conn.Read(buf[:])
 	if err != nil {
@@ -251,3 +251,56 @@ func (c *Client) readRetrRespLines() ([]string, error) {
 
 	return retrResp, nil
 }
+
+// Dele function deletes mail that is given as parameter.
+// DELE command takes mail number and returns 2 possible
+// message which are starts with "+OK" or "-ERR". POP3
+// server does not actually delete the mail until POP3
+// session enters the UPDATE state.
+//
+// mailNum string - mail number that will be deleted.
+func (c *Client) Dele(mailNum string) (string, error) {
+	return c.dele(mailNum)
+}
+
+// dele function is the implementation of the Dele function.
+// It sends the command and reads the server response.
+// Response is a string. Error is returned if unexpected
+// situations happen like unsuccessful command send or
+// response read.
+//
+// mailNum string - mail number that will be deleted.
+func (c *Client) dele(mailNum string) (string, error) {
+	// Send the DELE command.
+	err := c.sendDeleCmd(mailNum)
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+
+	// Read the DELE command's response.
+	deleResp, err := c.readResp()
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+
+	log.Println(deleResp)
+	return deleResp, nil
+}
+
+// sendDeleCmd function sends the DELE command with
+// mail number. It returns error if sending command
+// will be unsuccessful.
+//
+// mailNum string - mail number that will be deleted.
+func (c Client) sendDeleCmd(mailNum string) error {
+	buf := []byte("DELE " + mailNum + "\r\n")
+	_, err := c.Conn.Write(buf[:])
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
