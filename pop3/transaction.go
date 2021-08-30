@@ -177,3 +177,77 @@ func (c *Client) readListCmd() ([]string, error) {
 
 	return listResp, nil
 }
+
+// Retr retrieves the mails from the inbox. It indicates
+// RETR command in POP-3 protocol. It takes mailNum which
+// stands for mail number. In return phase, if the mail
+// is retrieved successfully, there are multiple lines.
+// The first line starts with "+OK" and follows with total
+// message size. On the following line, the POP3 server
+// sends the entire message. Finally, command response
+// ends with ".\r\n". If retrieving mail fails, the server
+// returns "-ERR". The line starts with "-ERR". The function
+// returns string array and error. Error is returned for
+// unexpected situations like sending command or reading
+// response fails. The string array contains the multiple
+// line responses.
+//
+// mailNum string - mail-number.
+func (c *Client) Retr(mailNum string) ([]string, error) {
+	return c.retr(mailNum)
+}
+
+// retr function is implementation of the Retr function.
+// It takes the mailNum. Firstly, sends RETR command and
+// reads the response which comes from the server.
+//
+// mailNum string - mail-number.
+func (c *Client) retr(mailNum string) ([]string, error) {
+	// Send the RETR command
+	err := c.sendRetrCmd(mailNum)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	// Read the response
+	retrResp, err := c.readRetrRespLines()
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return retrResp, nil
+}
+
+// sendRetrCmd sends the RETR command to POP3 server.
+// It returns error if writing fails.
+//
+// mailNum string - mail-number.
+func (c *Client) sendRetrCmd(mailNum string) error {
+	buf := []byte("RETR " + mailNum + "\r\n")
+	_, err := c.Conn.Write(buf[:])
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+// readRetrRespLines reads the response lines that come
+// from the POP3 server. It returns the string array which
+// contains the response lines.
+func (c *Client) readRetrRespLines() ([]string, error) {
+	var retrResp []string
+	var buf [512]byte
+
+	for string(buf[:]) != ".\r\n" {
+		r, err := c.Conn.Read(buf[:])
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+		retrResp = append(retrResp, string(buf[:r]))
+	}
+
+	return retrResp, nil
+}
