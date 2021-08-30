@@ -152,7 +152,7 @@ func (c Client) readListLines() ([]string, error) {
 	for string(buf[:]) != ".\r\n" {
 		r, err := c.Conn.Read(buf[:])
 		if err != nil {
-			return listResp, err
+			return nil, err
 		}
 		listResp = append(listResp, string(buf[:r]))
 	}
