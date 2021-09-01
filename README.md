@@ -80,3 +80,7 @@ func main() {
 
 :warning: This package is just for testing purposes. It is not development-ready package. If you use in production, be
 careful with the package. All issues are welcome and you can open an issue if you face any problem.
+
+### LICENSE
+
+[MIT](https://github.com/gozeloglu/gop-3/blob/main/LICENSE)
