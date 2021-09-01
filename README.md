@@ -4,6 +4,14 @@
 
 GOP-3 (Go + POP-3) is a POP-3 client for Go. It has experimental purpose and it is still under development.
 
+### Download
+
+You can download with the following command.
+
+```shell
+$ go get github.com/gozeloglu/gop-3
+```
+
 ## Example
 
 ```go
