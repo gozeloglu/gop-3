@@ -2,7 +2,7 @@
 
 #### Post Office Protocol - Version 3 (POP3) Go Client
 
-GOP-3 (Go + POP-3) is a POP-3 client for Go. It has experimental purpose and it is still under development. 
+GOP-3 (Go + POP-3) is a POP-3 client for Go. It has experimental purpose and it is still under development.
 
 ## Example
 
@@ -11,7 +11,7 @@ package main
 
 import (
 	"fmt"
-	"gop-3/pop3"
+	"github.com/gozeloglu/gop-3"
 	"log"
 )
 
@@ -67,6 +67,8 @@ func main() {
 ```
 
 #### References
+
 * [RFC 1939 POP3](https://www.ietf.org/rfc/rfc1939.txt)
 
-:warning: This package is just for testing purposes. It is not development-ready package. If you use in production, be careful with the package. All issues are welcome and you can open an issue if you face any problem.
+:warning: This package is just for testing purposes. It is not development-ready package. If you use in production, be
+careful with the package. All issues are welcome and you can open an issue if you face any problem.
