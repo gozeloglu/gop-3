@@ -26,7 +26,7 @@ func (c *Client) Stat() (string, error) {
 // the command and error is the unexpected
 // situations.
 func (c *Client) stat() (string, error) {
-	err := c.sendStatCmd()
+	err := c.sendCmd("STAT")
 	if err != nil {
 		log.Println(err)
 		return "", err
@@ -41,11 +41,12 @@ func (c *Client) stat() (string, error) {
 	return resp, nil
 }
 
-// sendStatCmd sends STAT command to server.
-// It ends with CRLF (\r\n). It returns if
-// something goes wrong while sending cmd.
-func (c *Client) sendStatCmd() error {
-	buf := []byte("STAT\r\n")
+// sendCmd is the function that send command
+// without any argument. It ends with CRLF
+// (\r\n). It returns if something goes wrong
+// while sending cmd.
+func (c *Client) sendCmd(cmd string) error {
+	buf := []byte(cmd + "\r\n")
 	_, err := c.Conn.Write(buf)
 	if err != nil {
 		log.Println(err)
@@ -304,3 +305,27 @@ func (c Client) sendDeleCmd(mailNum string) error {
 	return nil
 }
 
+// Noop is a command which does nothing. The POP3
+// server replies with a positive response.
+// Example:
+// 		C: NOOP
+// 		S: +OK
+// It takes no argument.
+func (c *Client) Noop() (string, error) {
+	return c.noop()
+}
+
+// noop is implementation of the Noop function.
+func (c *Client) noop() (string, error) {
+	err := c.sendCmd("NOOP")
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+	noop, err := c.readResp()
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+	return noop, nil
+}
