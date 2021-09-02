@@ -1,15 +1,15 @@
-# gop-3
+# gop-3 [![GoDoc](https://godoc.org/github.com/gozeloglu/gop-3?status.svg)](https://godoc.org/github.com/gozeloglu/gop-3) ![LICENSE](https://img.shields.io/badge/license-MIT-green)
 
 #### Post Office Protocol - Version 3 (POP3) Go Client
 
-GOP-3 (Go + POP-3) is a POP-3 client for Go. It has experimental purpose and it is still under development.
+GOP-3 (Go + POP-3) is a POP-3 client for Go. It has experimental purpose and it is still under development. [RFC 1939](https://www.ietf.org/rfc/rfc1939.txt) document has been followed while developing package.  
 
 ### Download
 
 You can download with the following command.
 
 ```shell
-$ go get github.com/gozeloglu/gop-3
+go get github.com/gozeloglu/gop-3
 ```
 
 ## Example
@@ -65,6 +65,20 @@ func main() {
 		fmt.Println(m)
 	}
 
+	// NOOP command
+	noop, err := pop.Noop()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	fmt.Println(noop)
+
+	// RSET command
+	rset, err := pop.Rset()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	fmt.Println(rset)
+	
 	// QUIT state
 	q, err := pop.Quit()
 	if err != nil {
