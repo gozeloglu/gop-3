@@ -75,18 +75,20 @@ func (c *Client) readResp() (string, error) {
 
 // List returns the mail information. It can take argument
 // optionally. There might be 2 different usage.
-// C: LIST
-// S: +OK 2 messages (360 octets)
-// S: 1 160
-// S: 2 200
-// S: .
+// Example-1:
+// 		C: LIST
+// 		S: +OK 2 messages (360 octets)
+// 		S: 1 160
+// 		S: 2 200
+// 		S: .
 //
-// C: LIST 1
-// S: +OK 2 160
-// C: LIST 2
-// S: +OK 2 200
-// C: LIST 3
-// S: -ERR no such message, only 2 messages in maildrop
+// Example-2:
+// 		C: LIST 1
+// 		S: +OK 2 160
+// 		C: LIST 2
+// 		S: +OK 2 200
+// 		C: LIST 3
+// 		S: -ERR no such message, only 2 messages in maildrop
 //
 // You do not need to pass any argument. The function
 // takes variadic parameter.
