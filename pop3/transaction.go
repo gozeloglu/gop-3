@@ -329,3 +329,36 @@ func (c *Client) noop() (string, error) {
 	}
 	return noop, nil
 }
+
+// Rset is a command which unmark if any message
+// is marked as deleted by the POP3 server. It takes
+// no argument. The POP3 server replies with positive
+// message as follows:
+//		C: RSET
+// 		S: +OK maildrop has 2 messages.
+func (c *Client) Rset() (string, error) {
+	return c.rset()
+}
+
+// rset is the implementation of the Rset function.
+// It sends command and reads response from server.
+// Returns string and error. String contains the
+// message comes from the server and error is
+// returned if something goes wrong while sending
+// command or reading response.
+func (c Client) rset() (string, error) {
+	err := c.sendCmd("RSET")
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+
+	resp, err := c.readResp()
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+
+	log.Println(resp)
+	return resp, nil
+}
