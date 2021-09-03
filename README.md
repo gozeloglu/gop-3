@@ -1,4 +1,4 @@
-# gop-3 [![GoDoc](https://godoc.org/github.com/gozeloglu/gop-3?status.svg)](https://godoc.org/github.com/gozeloglu/gop-3) ![LICENSE](https://img.shields.io/badge/license-MIT-green)
+# gop-3 [![GoDoc](https://godoc.org/github.com/gozeloglu/gop-3?status.svg)](https://godoc.org/github.com/gozeloglu/gop-3) ![LICENSE](https://img.shields.io/badge/license-MIT-green) [![Release](https://img.shields.io/badge/Release-v0.1.0--beta.2-blue)](https://github.com/gozeloglu/gop-3/releases) ![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/gozeloglu/gop-3?filename=go.mod)
 
 #### Post Office Protocol - Version 3 (POP3) Go Client
 
