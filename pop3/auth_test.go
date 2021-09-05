@@ -7,7 +7,6 @@ import (
 
 var (
 	c    = Client{}
-	ok = "+OK"
 )
 
 func TestIsAuth(t *testing.T) {

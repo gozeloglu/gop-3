@@ -30,13 +30,8 @@ type Client struct {
 }
 
 const (
-	// OK is successful server response's prefix
-	OK = "+OK"
-
-	// ERR is unsuccessful server response's prefix
-	ERR = "-ERR"
-
-	QUIT = "QUIT"
+	// ok is successful server response's prefix
+	ok = "+OK"
 )
 
 // Connect create and make a connection with POP3
@@ -163,7 +158,7 @@ func (c *Client) readGreetingMsg() error {
 // greeting string - greeting message comes from the
 // server.
 func (c *Client) isAuth(greeting string) bool {
-	return strings.HasPrefix(greeting, OK)
+	return strings.HasPrefix(greeting, ok)
 }
 
 // Quit closes the POP3 connection with POP3
@@ -212,7 +207,7 @@ func (c *Client) quit() (string, error) {
 // resp string - response message retrieved
 // after QUIT command.
 func isQuit(resp string) bool {
-	return strings.HasPrefix(resp, OK)
+	return strings.HasPrefix(resp, ok)
 }
 
 // sendQuitCmd sends the QUIT command to server
