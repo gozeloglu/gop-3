@@ -401,7 +401,7 @@ func (c *Client) User(name string) (string, error) {
 // goes wrong like reading response is failed.
 //
 // name string - username
-func (c Client) user(name string) (string, error) {
+func (c *Client) user(name string) (string, error) {
 	// Send USER command
 	cmd := "USER"
 	err := c.sendCmdWithArg(cmd, name)
@@ -419,4 +419,67 @@ func (c Client) user(name string) (string, error) {
 
 	log.Println(userResp)
 	return userResp, nil
+}
+
+// Pass is the function that sends password to POP3
+// server. This function should be called after User
+// function (USER command). The function takes password
+// as a string and returns (string, error) pair.
+// Password is a plaintext string, and it should be
+// read from environment variable. Of course, you
+// can declare in code and pass it to function, but
+// it is not secure for privacy and security. In
+// return, string contains the server response regarding
+// result of the PASS command. Server response can
+// start with "+OK" and "-ERR". If the password is
+// true and authentication step is passed successfully,
+// the server returns a message starts with "+OK". If
+// the password is not true or the mail server does
+// not authenticate with some reasons such as security
+// level, the server returns a message contains
+// negative status indicator ("-ERR"). Remaining
+// message parts can be customized by the mail server.
+// It depends on the mail server. For example, GMail
+// returns "+OK Welcome" message.
+// Example:
+// 		C: USER username
+// 		S: +OK send PASS
+// 		C: PASS wrongPassword
+//		S: -ERR Username and password not accepted.
+// 		...
+// 		C: USER username
+// 		S: +OK send PASS
+// 		C: PASS rightPassword
+//		S: +OK Welcome
+//
+// Note: Be sure that your mail server accepts less
+// secure apps. If not, give permission for less secure
+// apps.
+func (c *Client) Pass(password string) (string, error) {
+	return c.pass(password)
+}
+
+// pass is implementation of the Pass function. It takes
+// password as an argument and sends the PASS command.
+// Then, reads the server's response. Password is a
+// plaintext string. The function returns string and
+// error. String contains the server message which either
+// starts with "+OK" or "-ERR". If something goes wrong
+// while sending command or reading response steps, the
+// error returns.
+func (c *Client) pass(password string) (string, error) {
+	// Send PASS command
+	cmd := "PASS"
+	err := c.sendCmdWithArg(cmd, password)
+	if err != nil {
+		return "", err
+	}
+
+	// Read response message
+	passResp, err := c.readResp()
+	if err != nil {
+		return "", err
+	}
+
+	return passResp, nil
 }

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/gozeloglu/gop-3"
 	"log"
+	"os"
 )
 
 func main() {
@@ -31,14 +32,23 @@ func main() {
 
 	fmt.Println(pop.GreetingMsg)  // Message starts with "+OK"
 	fmt.Println(pop.IsAuthorized) // true
-    
+
 	// USER command
-	u, err := pop.User("userName")
+	username := os.Getenv("POP3_USER")  // Read from env
+	u, err := pop.User(username)
 	if err != nil {
 		log.Fatalf(err.Error())
-    }
+	}
 	fmt.Println(u)
-	
+
+	// PASS command
+	password := os.Getenv("POP3_PASSWORD")  // Read from env
+	pass, err := pop.Pass(password)
+	if err != nil {
+	    log.Fatalf(err.Error())	
+	}
+	fmt.Println(pass)
+
 	// STAT command
 	stat, err := pop.Stat()
 	if err != nil {
@@ -85,7 +95,7 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 	fmt.Println(rset)
-	
+
 	// QUIT state
 	q, err := pop.Quit()
 	if err != nil {
@@ -95,12 +105,21 @@ func main() {
 }
 ```
 
-#### References
+
+### Run & Test
+
+If you make changes, make sure that all tests are passed. You can run the tests with the following command.
+
+```shell
+go test pop3/* -v 
+```
+
+### References
 
 * [RFC 1939 POP3](https://www.ietf.org/rfc/rfc1939.txt)
 
 :warning: This package is just for testing purposes. It is not development-ready package. If you use in production, be
-careful with the package. All issues are welcome and you can open an issue if you face any problem.
+careful with the package. All issues are welcome, and you can open an issue if you face any problem.
 
 ### LICENSE
 
