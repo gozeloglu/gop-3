@@ -31,7 +31,14 @@ func main() {
 
 	fmt.Println(pop.GreetingMsg)  // Message starts with "+OK"
 	fmt.Println(pop.IsAuthorized) // true
-
+    
+	// USER command
+	u, err := pop.User("userName")
+	if err != nil {
+		log.Fatalf(err.Error())
+    }
+	fmt.Println(u)
+	
 	// STAT command
 	stat, err := pop.Stat()
 	if err != nil {

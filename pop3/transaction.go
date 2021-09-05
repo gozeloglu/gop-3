@@ -275,7 +275,8 @@ func (c *Client) Dele(mailNum string) (string, error) {
 // mailNum string - mail number that will be deleted.
 func (c *Client) dele(mailNum string) (string, error) {
 	// Send the DELE command.
-	err := c.sendDeleCmd(mailNum)
+	cmd := "DELE"
+	err := c.sendCmdWithArg(cmd, mailNum)
 	if err != nil {
 		log.Println(err)
 		return "", err
@@ -292,13 +293,14 @@ func (c *Client) dele(mailNum string) (string, error) {
 	return deleResp, nil
 }
 
-// sendDeleCmd function sends the DELE command with
-// mail number. It returns error if sending command
+// sendCmdWithArg function sends the POP3 command with
+// argument. It returns error if sending command
 // will be unsuccessful.
 //
-// mailNum string - mail number that will be deleted.
-func (c Client) sendDeleCmd(mailNum string) error {
-	buf := []byte("DELE " + mailNum + "\r\n")
+// cmd string - command that send will send
+// arg string - argument which command takes
+func (c Client) sendCmdWithArg(cmd string, arg string) error {
+	buf := []byte(cmd + " " + arg + "\r\n")
 	_, err := c.Conn.Write(buf[:])
 	if err != nil {
 		log.Println(err)
@@ -363,4 +365,58 @@ func (c Client) rset() (string, error) {
 
 	log.Println(resp)
 	return resp, nil
+}
+
+// User is the function that  authenticates the user.
+// It takes username as a parameter and returns server
+// response and error if something goes wrong. Firstly,
+// the server checks the username and returns response
+// message to client. If the message starts with "+OK",
+// it means that the username is valid. If authentication
+// fails, the server may respond with negative status
+// indicator ("-ERR"). In such case, you may either
+// issue a new authentication command or may issue the
+// QUIT command. The server may return a positive response
+// even though no such mailbox exits. Also, the server
+// may return a negative status indicator even if the
+// username is exists because the mail server does not
+// permit plaintext password authentication.
+// Example:
+//		C: USER testUser
+//		S: -ERR no such mailbox
+//		...
+//		C: USER validUser
+//		S: +OK send PASS
+//
+// name string - username of the mailbox
+func (c *Client) User(name string) (string, error) {
+	return c.user(name)
+}
+
+// user is the implementation of the User function.
+// It firstly sends the USER command and read response
+// comes from the server. It returns string and error.
+// String represents server's response message and
+// error returns when unexpected situations if something
+// goes wrong like reading response is failed.
+//
+// name string - username
+func (c Client) user(name string) (string, error) {
+	// Send USER command
+	cmd := "USER"
+	err := c.sendCmdWithArg(cmd, name)
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+
+	// Read server response
+	userResp, err := c.readResp()
+	if err != nil {
+		log.Println(err)
+		return "", nil
+	}
+
+	log.Println(userResp)
+	return userResp, nil
 }
