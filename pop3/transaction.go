@@ -111,9 +111,9 @@ func (c *Client) list(mailNum []int) ([]string, error) {
 	var msgList []string
 
 	if len(mailNum) > 0 {
-		err = c.sendListCmd(strconv.Itoa(mailNum[0]))
+		err = c.sendCmdWithArg("LIST", strconv.Itoa(mailNum[0]))
 	} else {
-		err = c.sendListCmd("")
+		err = c.sendCmd("LIST")
 	}
 	if err != nil {
 		log.Println(err)
@@ -128,22 +128,6 @@ func (c *Client) list(mailNum []int) ([]string, error) {
 	return msgList, err
 }
 
-// sendListCmd sends the LIST command to POP3 server.
-// The command ends with CRLF (\r\n). It can take the
-// number of the message.
-//
-// mailNum string - mail number that listing. It can
-// be empty string. If it is empty string, only
-// "LIST" command is called.
-func (c *Client) sendListCmd(mailNum string) error {
-	buf := []byte("LIST " + mailNum + "\r\n")
-	_, err := c.Conn.Write(buf)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	return nil
-}
 
 // readListLines reads the response that has multiple
 // lines until reaching ".\r\n" character set. Each
