@@ -3,7 +3,6 @@ package pop3
 import (
 	"crypto/tls"
 	"fmt"
-	"log"
 	"net"
 	"strings"
 )
@@ -71,7 +70,6 @@ func connectPOP3TLS(addr string, config *tls.Config) (Client, error) {
 
 	tlsConn, err := tls.Dial("tcp", addr, config)
 	if err != nil {
-		log.Println(err)
 		return *c, err
 	}
 	c.Conn = tlsConn
@@ -79,7 +77,6 @@ func connectPOP3TLS(addr string, config *tls.Config) (Client, error) {
 
 	err = c.readGreetingMsg()
 	if err != nil {
-		log.Println(err)
 		return Client{}, err
 	}
 	return *c, nil
@@ -100,7 +97,6 @@ func connectPOP3(addr string) (Client, error) {
 
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
-		log.Println(err)
 		return *c, err
 	}
 	c.Conn = conn
@@ -108,7 +104,6 @@ func connectPOP3(addr string) (Client, error) {
 
 	err = c.readGreetingMsg()
 	if err != nil {
-		log.Println(err)
 		return Client{}, err
 	}
 
@@ -130,7 +125,6 @@ func (c *Client) readGreetingMsg() error {
 
 	r, err := c.Conn.Read(buf[:])
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	resp := string(buf[:r])
@@ -139,13 +133,11 @@ func (c *Client) readGreetingMsg() error {
 	// message, returns an error.
 	if !c.isAuth(resp) {
 		e := "not authorized to POP3 server"
-		log.Println(e)
 		return fmt.Errorf(e)
 	}
 	c.GreetingMsg = resp
 	c.IsAuthorized = true
 
-	log.Println(resp)
 	return nil
 }
 
@@ -192,8 +184,6 @@ func (c *Client) quit() (string, error) {
 	if isQuit(qResp) {
 		defer c.Conn.Close()
 		defer c.changeClientState()
-		log.Println(c.IsAuthorized)
-		log.Println(c.Addr)
 	}
 
 	return qResp, nil
@@ -219,7 +209,6 @@ func (c Client) sendQuitCmd() error {
 	buf := []byte("QUIT\r\n")
 	_, err := c.Conn.Write(buf)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -234,11 +223,9 @@ func (c *Client) readQuitResp() (string, error) {
 	var buf [512]byte
 	r, err := c.Conn.Read(buf[:])
 	if err != nil {
-		log.Printf(err.Error())
 		return "", err
 	}
 	resp := string(buf[:r])
-	log.Println(resp)
 	return resp, nil
 }
 

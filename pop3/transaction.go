@@ -1,7 +1,6 @@
 package pop3
 
 import (
-	"log"
 	"strconv"
 )
 
@@ -13,7 +12,6 @@ func (c *Client) sendCmd(cmd string) error {
 	buf := []byte(cmd + "\r\n")
 	_, err := c.Conn.Write(buf)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -29,7 +27,6 @@ func (c Client) sendCmdWithArg(cmd string, arg string) error {
 	buf := []byte(cmd + " " + arg + "\r\n")
 	_, err := c.Conn.Write(buf[:])
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -44,12 +41,10 @@ func (c *Client) readResp() (string, error) {
 	var buf [512]byte
 	r, err := c.Conn.Read(buf[:])
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
 	resp := string(buf[:r])
-	log.Println(resp)
 	return resp, nil
 }
 
@@ -94,13 +89,11 @@ func (c *Client) Stat() (string, error) {
 func (c *Client) stat() (string, error) {
 	err := c.sendCmd("STAT")
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
 	resp, err := c.readResp()
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
@@ -151,7 +144,6 @@ func (c *Client) list(mailNum []int) ([]string, error) {
 		err = c.sendCmd("LIST")
 	}
 	if err != nil {
-		log.Println(err)
 		return msgList, err
 	}
 
@@ -192,14 +184,12 @@ func (c *Client) retr(mailNum string) ([]string, error) {
 	// Send the RETR command
 	err := c.sendCmdWithArg("RETR", mailNum)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
 	// Read the response
 	retrResp, err := c.readRespMultiLines()
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return retrResp, nil
@@ -228,18 +218,14 @@ func (c *Client) dele(mailNum string) (string, error) {
 	cmd := "DELE"
 	err := c.sendCmdWithArg(cmd, mailNum)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
 	// Read the DELE command's response.
 	deleResp, err := c.readResp()
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
-
-	log.Println(deleResp)
 	return deleResp, nil
 }
 
@@ -257,12 +243,10 @@ func (c *Client) Noop() (string, error) {
 func (c *Client) noop() (string, error) {
 	err := c.sendCmd("NOOP")
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 	noop, err := c.readResp()
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 	return noop, nil
@@ -287,17 +271,14 @@ func (c *Client) Rset() (string, error) {
 func (c Client) rset() (string, error) {
 	err := c.sendCmd("RSET")
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
 	resp, err := c.readResp()
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
-	log.Println(resp)
 	return resp, nil
 }
 
@@ -340,18 +321,15 @@ func (c *Client) user(name string) (string, error) {
 	cmd := "USER"
 	err := c.sendCmdWithArg(cmd, name)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
 	// Read server response
 	userResp, err := c.readResp()
 	if err != nil {
-		log.Println(err)
 		return "", nil
 	}
 
-	log.Println(userResp)
 	return userResp, nil
 }
 
