@@ -10,6 +10,8 @@ const (
 	btAddr       = "mail.btopenworld.com:110"
 	btTLSAddr    = "mail.btopenworld.com:995"
 	gmailTLSAddr = "pop.gmail.com:995"
+	userKey      = "POP3_USER"
+	passwordKey  = "POP3_PASSWORD"
 )
 
 func TestUserCmd(t *testing.T) {
@@ -75,7 +77,7 @@ func TestPassCmd(t *testing.T) {
 	}
 
 	// read username from env variable
-	username := os.Getenv("POP3_USER")
+	username := os.Getenv(userKey)
 	u, err := pop.User(username)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -86,7 +88,7 @@ func TestPassCmd(t *testing.T) {
 	}
 
 	// read password from env variable
-	password := os.Getenv("POP3_PASSWORD")
+	password := os.Getenv(passwordKey)
 	p, err := pop.Pass(password)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -103,7 +105,7 @@ func TestStat(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	username := os.Getenv("POP3_USER")
+	username := os.Getenv(userKey)
 	u, err := pop.User(username)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -113,7 +115,7 @@ func TestStat(t *testing.T) {
 		t.Errorf("expected: %s, got: %s", ok, u)
 	}
 
-	password := os.Getenv("POP3_PASSWORD")
+	password := os.Getenv(passwordKey)
 	p, err := pop.Pass(password)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -162,5 +164,113 @@ func TestStatErr(t *testing.T) {
 
 	if !strings.HasPrefix(s, e) {
 		t.Errorf("expected: %s, got: %s", e, s)
+	}
+}
+
+func TestList(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	username := os.Getenv(userKey)
+	u, err := pop.User(username)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(u, ok) {
+		t.Errorf("expected: %s, got: %s", ok, u)
+	}
+
+	password := os.Getenv(passwordKey)
+	p, err := pop.Pass(password)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(p, ok) {
+		t.Errorf("expected: %s, got: %s", ok, p)
+	}
+
+	l, err := pop.List()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(l[0], ok) {
+		t.Errorf("expected: %s, got: %s", ok, l[0])
+	}
+}
+
+func TestListUnauthorized(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	l, err := pop.List()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(l[0], e) {
+		t.Errorf("expected:%s, got: %s", l, e)
+	}
+}
+
+func TestListWithArg(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	username := os.Getenv(userKey)
+	u, err := pop.User(username)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(u, ok) {
+		t.Errorf("expected: %s, got: %s", ok, u)
+	}
+
+	password := os.Getenv(passwordKey)
+	p, err := pop.Pass(password)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(p, ok) {
+		t.Errorf("expected: %s, got: %s", ok, p)
+	}
+
+	l, err := pop.List(1)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(l[0], ok) {
+		t.Errorf("expected: %s, got: %s", ok, l[0])
+	}
+
+	if len(l) != 1 {
+		t.Errorf("expected length: %v, l's length: %v", 1, len(l))
+	}
+}
+
+func TestListWithArgUnauthorized(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	l, err := pop.List(1)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(l[0], e) {
+		t.Errorf("expected: %s, got: %s", e, l[0])
 	}
 }

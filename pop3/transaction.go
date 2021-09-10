@@ -2,6 +2,7 @@ package pop3
 
 import (
 	"strconv"
+	"strings"
 )
 
 // sendCmd is the function that send command
@@ -55,13 +56,12 @@ func (c Client) readRespMultiLines() ([]string, error) {
 	var buf [512]byte
 	var listResp []string
 
-	for string(buf[:]) != ".\r\n" {
-		r, err := c.Conn.Read(buf[:])
-		if err != nil {
-			return nil, err
-		}
-		listResp = append(listResp, string(buf[:r]))
+	r, err := c.Conn.Read(buf[:])
+	if err != nil {
+		return nil, err
 	}
+	resp := string(buf[:r])
+	listResp = append(listResp, strings.Split(resp, "\r\n")...)
 
 	return listResp, nil
 }
@@ -148,10 +148,10 @@ func (c *Client) list(mailNum []int) ([]string, error) {
 	}
 
 	if len(mailNum) == 0 {
+		msgList, err = c.readRespMultiLines()
+	} else {
 		msg, err = c.readResp()
 		msgList = append(msgList, msg)
-	} else {
-		msgList, err = c.readRespMultiLines()
 	}
 	return msgList, err
 }
