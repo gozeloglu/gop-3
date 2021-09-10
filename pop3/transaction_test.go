@@ -6,9 +6,14 @@ import (
 	"testing"
 )
 
+const (
+	btAddr       = "mail.btopenworld.com:110"
+	btTLSAddr    = "mail.btopenworld.com:995"
+	gmailTLSAddr = "pop.gmail.com:995"
+)
+
 func TestUserCmd(t *testing.T) {
-	addr := "mail.btopenworld.com:110"
-	pop, err := Connect(addr, nil, false)
+	pop, err := Connect(btAddr, nil, false)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -24,8 +29,7 @@ func TestUserCmd(t *testing.T) {
 }
 
 func TestUserCmdWithTLS(t *testing.T) {
-	addr := "mail.btopenworld.com:995"
-	pop, err := Connect(addr, nil, true)
+	pop, err := Connect(btTLSAddr, nil, true)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -41,8 +45,7 @@ func TestUserCmdWithTLS(t *testing.T) {
 }
 
 func TestUserGMail(t *testing.T) {
-	addr := "pop.gmail.com:995"
-	pop, err := Connect(addr, nil, true)
+	pop, err := Connect(gmailTLSAddr, nil, true)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -66,8 +69,7 @@ func TestUserGMail(t *testing.T) {
 // link and give permission to less secure apps.
 // https://myaccount.google.com/lesssecureapps
 func TestPassCmd(t *testing.T) {
-	addr := "pop.gmail.com:995"
-	pop, err := Connect(addr, nil, true)
+	pop, err := Connect(gmailTLSAddr, nil, true)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -92,5 +94,73 @@ func TestPassCmd(t *testing.T) {
 
 	if !strings.HasPrefix(p, ok) {
 		t.Errorf("expected: %s, got: %s", ok, p)
+	}
+}
+
+func TestStat(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	username := os.Getenv("POP3_USER")
+	u, err := pop.User(username)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(u, ok) {
+		t.Errorf("expected: %s, got: %s", ok, u)
+	}
+
+	password := os.Getenv("POP3_PASSWORD")
+	p, err := pop.Pass(password)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(p, ok) {
+		t.Errorf("expected: %s, got: %s", ok, p)
+	}
+
+	s, err := pop.Stat()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(s, ok) {
+		t.Errorf("expected: %s, got: %s", ok, s)
+	}
+}
+
+func TestStatUnauthorized(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	s, err := pop.Stat()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(s, e) {
+		t.Errorf("expected: %s, got: %s", s, e)
+	}
+}
+
+func TestStatErr(t *testing.T) {
+	pop, err := Connect(btAddr, nil, false)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	s, err := pop.Stat()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(s, e) {
+		t.Errorf("expected: %s, got: %s", e, s)
 	}
 }

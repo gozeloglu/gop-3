@@ -31,6 +31,9 @@ type Client struct {
 const (
 	// ok is successful server response's prefix
 	ok = "+OK"
+
+	// e is unsuccessful server response's prefix
+	e = "-ERR"
 )
 
 // Connect create and make a connection with POP3
