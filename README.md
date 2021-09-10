@@ -126,6 +126,17 @@ If you make changes, make sure that all tests are passed. You can run the tests 
 go test pop3/* -v 
 ```
 
+If you want to run only one test, you can type the following command.
+
+```shell
+go test pop3/* -v -run <test_function_name>
+```
+
+Example: 
+```shell
+go test pop3/* -v -run TestStat
+```
+
 ### References
 
 * [RFC 1939 POP3](https://www.ietf.org/rfc/rfc1939.txt)
