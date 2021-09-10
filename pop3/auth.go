@@ -18,14 +18,14 @@ type Client struct {
 	// Addr is POP3 address.
 	Addr string
 
-	// GreetingMsg keeps server response in AUTHORIZATION state.
-	GreetingMsg string
+	// greetingMsg keeps server response in AUTHORIZATION state.
+	greetingMsg string
 
-	// IsAuthorized keeps status of AUTHORIZATION state.
-	IsAuthorized bool
+	// isAuthorized keeps status of AUTHORIZATION state.
+	isAuthorized bool
 
-	// IsEncrypted stands for whether mail server encrypted with TLS.
-	IsEncrypted bool
+	// isEncrypted stands for whether mail server encrypted with TLS.
+	isEncrypted bool
 }
 
 const (
@@ -66,9 +66,9 @@ func connectPOP3TLS(addr string, config *tls.Config) (Client, error) {
 	c := &Client{
 		Conn:         nil,
 		Addr:         "",
-		GreetingMsg:  "",
-		IsAuthorized: false,
-		IsEncrypted:  true,
+		greetingMsg:  "",
+		isAuthorized: false,
+		isEncrypted:  true,
 	}
 
 	tlsConn, err := tls.Dial("tcp", addr, config)
@@ -93,9 +93,9 @@ func connectPOP3(addr string) (Client, error) {
 	c := &Client{
 		Conn:         nil,
 		Addr:         "",
-		GreetingMsg:  "",
-		IsAuthorized: false,
-		IsEncrypted:  false,
+		greetingMsg:  "",
+		isAuthorized: false,
+		isEncrypted:  false,
 	}
 
 	conn, err := net.Dial("tcp", addr)
@@ -138,8 +138,8 @@ func (c *Client) readGreetingMsg() error {
 		e := "not authorized to POP3 server"
 		return fmt.Errorf(e)
 	}
-	c.GreetingMsg = resp
-	c.IsAuthorized = true
+	c.greetingMsg = resp
+	c.isAuthorized = true
 
 	return nil
 }
@@ -239,7 +239,26 @@ func (c *Client) readQuitResp() (string, error) {
 func (c *Client) changeClientState() {
 	c.Conn = nil
 	c.Addr = ""
-	c.GreetingMsg = ""
-	c.IsAuthorized = false
+	c.greetingMsg = ""
+	c.isAuthorized = false
 
+}
+
+// GreetingMsg returns the greeting message which
+// server response when connected to mail server.
+// The message is returned in AUTHORIZATION state.
+func (c *Client) GreetingMsg() string {
+	return c.greetingMsg
+}
+
+// IsAuthorized returns the information that
+// keeps the status of AUTHORIZATION state.
+func (c *Client) IsAuthorized() bool {
+	return c.isAuthorized
+}
+
+// IsEncrypted returns the information whether
+// the server is encrypted with TLS.
+func (c *Client) IsEncrypted() bool {
+	return c.isEncrypted
 }

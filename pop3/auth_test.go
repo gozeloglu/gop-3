@@ -39,8 +39,8 @@ func TestConnect(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if !pop.IsAuthorized {
-		t.Errorf("Expected: %v, got: %v", true, pop.IsAuthorized)
+	if !pop.IsAuthorized() {
+		t.Errorf("Expected: %v, got: %v", true, pop.isAuthorized)
 	}
 
 	if pop.Addr != addr {
@@ -60,8 +60,8 @@ func TestConnectTLS(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if !pop.IsAuthorized {
-		t.Errorf("Expected: %v, got: %v", true, pop.IsAuthorized)
+	if !pop.IsAuthorized() {
+		t.Errorf("Expected: %v, got: %v", true, pop.IsAuthorized())
 	}
 
 	if pop.Addr != addr {
@@ -86,8 +86,8 @@ func TestClient_Quit(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if pop.IsAuthorized != false {
-		t.Errorf("Expected c.IsAuthorized %v, got: %v", false, pop.IsAuthorized)
+	if pop.IsAuthorized() != false {
+		t.Errorf("Expected c.IsAuthorized %v, got: %v", false, pop.IsAuthorized())
 	}
 
 	if !strings.Contains(got, ok) {
@@ -108,11 +108,55 @@ func TestClientTLS_Quit(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if popTLS.IsAuthorized != false {
-		t.Errorf("expected popTLS.IsAuthorized: %v, got: %v", false, popTLS.IsAuthorized)
+	if popTLS.IsAuthorized() != false {
+		t.Errorf("expected popTLS.IsAuthorized: %v, got: %v", false, popTLS.IsAuthorized())
 	}
 
 	if !strings.Contains(got, ok) {
 		t.Errorf("expected: %s, got: %s", ok, got)
+	}
+}
+
+func TestClient_IsEncrypted(t *testing.T) {
+	pop, err := Connect("pop.gmail.com:995", nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !pop.IsEncrypted() {
+		t.Errorf("expected: %v, got: %v", true, pop.IsEncrypted())
+	}
+}
+
+func TestClient_IsNotEncrypted(t *testing.T) {
+	pop, err := Connect("mail.pop3.com:110", nil, false)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if pop.IsEncrypted() {
+		t.Errorf("expected: %v, got: %v", false, pop.IsEncrypted())
+	}
+}
+
+func TestClient_IsAuthorized(t *testing.T) {
+	pop, err := Connect("mail.pop3.com:110", nil, false)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !pop.IsAuthorized() {
+		t.Errorf("expected: %v, got: %v", true, pop.IsAuthorized())
+	}
+}
+
+func TestClient_GreetingMsg(t *testing.T) {
+	pop, err := Connect("mail.pop3.com:110", nil, false)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(pop.GreetingMsg(), ok) {
+		t.Errorf("expected: %s, got: %s", ok, pop.GreetingMsg())
 	}
 }

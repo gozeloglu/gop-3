@@ -37,13 +37,14 @@ import (
 )
 
 func main() {
-	pop, err := pop3.Connect("mail.pop3.com:110")
+	pop, err := pop3.Connect("mail.pop3.com:110", nil, false)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	fmt.Println(pop.GreetingMsg)  // Message starts with "+OK"
-	fmt.Println(pop.IsAuthorized) // true
+	fmt.Println(pop.GreetingMsg())  // Message starts with "+OK"
+	fmt.Println(pop.IsAuthorized()) // true
+	fmt.Println(pop.IsEncrypted())  // false
 
 	// USER command
 	username := os.Getenv("POP3_USER")  // Read from env
@@ -57,61 +58,61 @@ func main() {
 	password := os.Getenv("POP3_PASSWORD")  // Read from env
 	pass, err := pop.Pass(password)
 	if err != nil {
-	    log.Fatalf(err.Error())	
+            log.Fatalf(err.Error())	
 	}
 	fmt.Println(pass)
 
 	// STAT command
 	stat, err := pop.Stat()
 	if err != nil {
-		log.Fatalf(err.Error())
+            log.Fatalf(err.Error())
 	}
 	fmt.Println(stat)
 
 	// LIST command
-	s, _ := pop.List()
-	if len(s) == 0 {
-		fmt.Println(s)
+	l, _ := pop.List()
+	if len(l) == 0 {
+		fmt.Println(l)
 	}
 
 	// LIST <mail-num> command
-	l, _ := pop.List(1)
-	fmt.Println(l[0])
+	ll, _ := pop.List(1)
+	fmt.Println(ll[0])
 
 	// DELE command
 	dele, err := pop.Dele("1")
 	if err != nil {
-		log.Fatalf(err.Error())
+            log.Fatalf(err.Error())
 	}
 	fmt.Println(dele)
 
 	// RETR command 
 	retr, err := pop.Retr("1")
 	if err != nil {
-		log.Fatalf(err.Error())
+            log.Fatalf(err.Error())
 	}
 	for _, m := range retr {
-		fmt.Println(m)
+            fmt.Println(m)
 	}
 
 	// NOOP command
 	noop, err := pop.Noop()
 	if err != nil {
-		log.Fatalf(err.Error())
+            log.Fatalf(err.Error())
 	}
 	fmt.Println(noop)
 
 	// RSET command
 	rset, err := pop.Rset()
 	if err != nil {
-		log.Fatalf(err.Error())
+            log.Fatalf(err.Error())
 	}
 	fmt.Println(rset)
 
 	// QUIT state
 	q, err := pop.Quit()
 	if err != nil {
-		log.Fatalf(err.Error())
+            log.Fatalf(err.Error())
 	}
 	fmt.Println(q) // Prints: "QUIT"
 }
