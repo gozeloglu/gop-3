@@ -5,6 +5,72 @@ import (
 	"strconv"
 )
 
+// sendCmd is the function that send command
+// without any argument. It ends with CRLF
+// (\r\n). It returns if something goes wrong
+// while sending cmd.
+func (c *Client) sendCmd(cmd string) error {
+	buf := []byte(cmd + "\r\n")
+	_, err := c.Conn.Write(buf)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+// sendCmdWithArg function sends the POP3 command with
+// argument. It returns error if sending command
+// will be unsuccessful.
+//
+// cmd string - command that send will send
+// arg string - argument which command takes
+func (c Client) sendCmdWithArg(cmd string, arg string) error {
+	buf := []byte(cmd + " " + arg + "\r\n")
+	_, err := c.Conn.Write(buf[:])
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+// readResp reads the command's response.
+// It allocates a byte array with size of 512 byte.
+// Read and store the response into buf array.
+// Finally, the byte array converts to string and
+// return.
+func (c *Client) readResp() (string, error) {
+	var buf [512]byte
+	r, err := c.Conn.Read(buf[:])
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+
+	resp := string(buf[:r])
+	log.Println(resp)
+	return resp, nil
+}
+
+// readRespMultiLines reads the response that has multiple
+// lines until reaching ".\r\n" character set. Each
+// line is added to listResp array.
+func (c Client) readRespMultiLines() ([]string, error) {
+	var buf [512]byte
+	var listResp []string
+
+	for string(buf[:]) != ".\r\n" {
+		r, err := c.Conn.Read(buf[:])
+		if err != nil {
+			return nil, err
+		}
+		listResp = append(listResp, string(buf[:r]))
+	}
+
+	return listResp, nil
+}
+
 // Stat is a TRANSACTION state command. It
 // shows that how many mails are in the inbox
 // and size of the maildrop in octets. Stat
@@ -38,38 +104,6 @@ func (c *Client) stat() (string, error) {
 		return "", err
 	}
 
-	return resp, nil
-}
-
-// sendCmd is the function that send command
-// without any argument. It ends with CRLF
-// (\r\n). It returns if something goes wrong
-// while sending cmd.
-func (c *Client) sendCmd(cmd string) error {
-	buf := []byte(cmd + "\r\n")
-	_, err := c.Conn.Write(buf)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	return nil
-}
-
-// readResp reads the command's response.
-// It allocates a byte array with size of 512 byte.
-// Read and store the response into buf array.
-// Finally, the byte array converts to string and
-// return.
-func (c *Client) readResp() (string, error) {
-	var buf [512]byte
-	r, err := c.Conn.Read(buf[:])
-	if err != nil {
-		log.Println(err)
-		return "", err
-	}
-
-	resp := string(buf[:r])
-	log.Println(resp)
 	return resp, nil
 }
 
@@ -108,6 +142,7 @@ func (c *Client) List(mainNum ...int) ([]string, error) {
 // mailNum []int - mail numbers.
 func (c *Client) list(mailNum []int) ([]string, error) {
 	var err error
+	var msg string
 	var msgList []string
 
 	if len(mailNum) > 0 {
@@ -121,48 +156,12 @@ func (c *Client) list(mailNum []int) ([]string, error) {
 	}
 
 	if len(mailNum) == 0 {
-		msgList, err = c.readListLines()
+		msg, err = c.readResp()
+		msgList = append(msgList, msg)
 	} else {
-		msgList, err = c.readListCmd()
+		msgList, err = c.readRespMultiLines()
 	}
 	return msgList, err
-}
-
-
-// readListLines reads the response that has multiple
-// lines until reaching ".\r\n" character set. Each
-// line is added to listResp array.
-func (c Client) readListLines() ([]string, error) {
-	var buf [512]byte
-	var listResp []string
-
-	for string(buf[:]) != ".\r\n" {
-		r, err := c.Conn.Read(buf[:])
-		if err != nil {
-			return nil, err
-		}
-		listResp = append(listResp, string(buf[:r]))
-	}
-
-	return listResp, nil
-}
-
-// readListCmd reads the "LIST" command's response.
-// It has only one line. Finally, response is converted
-// to string and returned it.
-func (c *Client) readListCmd() ([]string, error) {
-	var buf [512]byte
-	var listResp []string
-
-	r, err := c.Conn.Read(buf[:])
-	if err != nil {
-		log.Println(err)
-		return listResp, err
-	}
-	resp := string(buf[:r])
-	listResp = append(listResp, resp)
-
-	return listResp, nil
 }
 
 // Retr retrieves the mails from the inbox. It indicates
@@ -191,51 +190,18 @@ func (c *Client) Retr(mailNum string) ([]string, error) {
 // mailNum string - mail-number.
 func (c *Client) retr(mailNum string) ([]string, error) {
 	// Send the RETR command
-	err := c.sendRetrCmd(mailNum)
+	err := c.sendCmdWithArg("RETR", mailNum)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 
 	// Read the response
-	retrResp, err := c.readRetrRespLines()
+	retrResp, err := c.readRespMultiLines()
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
-	return retrResp, nil
-}
-
-// sendRetrCmd sends the RETR command to POP3 server.
-// It returns error if writing fails.
-//
-// mailNum string - mail-number.
-func (c *Client) sendRetrCmd(mailNum string) error {
-	buf := []byte("RETR " + mailNum + "\r\n")
-	_, err := c.Conn.Write(buf[:])
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	return nil
-}
-
-// readRetrRespLines reads the response lines that come
-// from the POP3 server. It returns the string array which
-// contains the response lines.
-func (c *Client) readRetrRespLines() ([]string, error) {
-	var retrResp []string
-	var buf [512]byte
-
-	for string(buf[:]) != ".\r\n" {
-		r, err := c.Conn.Read(buf[:])
-		if err != nil {
-			log.Println(err)
-			return nil, err
-		}
-		retrResp = append(retrResp, string(buf[:r]))
-	}
-
 	return retrResp, nil
 }
 
@@ -275,22 +241,6 @@ func (c *Client) dele(mailNum string) (string, error) {
 
 	log.Println(deleResp)
 	return deleResp, nil
-}
-
-// sendCmdWithArg function sends the POP3 command with
-// argument. It returns error if sending command
-// will be unsuccessful.
-//
-// cmd string - command that send will send
-// arg string - argument which command takes
-func (c Client) sendCmdWithArg(cmd string, arg string) error {
-	buf := []byte(cmd + " " + arg + "\r\n")
-	_, err := c.Conn.Write(buf[:])
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	return nil
 }
 
 // Noop is a command which does nothing. The POP3
