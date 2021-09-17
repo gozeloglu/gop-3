@@ -375,3 +375,120 @@ func TestRetrFail(t *testing.T) {
 		t.Errorf("expected prefix: %s, got %s message", ok, r[0])
 	}
 }
+
+func TestDele(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	username := os.Getenv(userKey)
+	u, err := pop.User(username)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(u, ok) {
+		t.Errorf("expected: %s, got: %s", ok, u)
+	}
+
+	password := os.Getenv(passwordKey)
+	p, err := pop.Pass(password)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(p, ok) {
+		t.Errorf("expected: %s, got: %s", ok, p)
+	}
+
+	d, err := pop.Dele("1")
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(d, ok) {
+		t.Errorf("expected prefix: %s, got: %s", ok, d)
+	}
+}
+
+func TestDeleFail(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	username := os.Getenv(userKey)
+	u, err := pop.User(username)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(u, ok) {
+		t.Errorf("expected: %s, got: %s", ok, u)
+	}
+
+	password := os.Getenv(passwordKey)
+	p, err := pop.Pass(password)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(p, ok) {
+		t.Errorf("expected: %s, got: %s", ok, p)
+	}
+
+	d, err := pop.Dele(strconv.Itoa(math.MaxInt64 - 1))
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(d, e) {
+		t.Errorf("expected prefix: %s, got: %s", e, d)
+	}
+}
+
+func TestRset(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	username := os.Getenv(userKey)
+	u, err := pop.User(username)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(u, ok) {
+		t.Errorf("expected: %s, got: %s", ok, u)
+	}
+
+	password := os.Getenv(passwordKey)
+	p, err := pop.Pass(password)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(p, ok) {
+		t.Errorf("expected: %s, got: %s", ok, p)
+	}
+
+	d, err := pop.Dele("1")
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(d, ok) {
+		t.Errorf("expected prefix: %s, got: %s", ok, d)
+	}
+
+	r, err := pop.Rset()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(r, ok) {
+		t.Errorf("expected prefix: %s, got: %s", ok, r)
+	}
+}

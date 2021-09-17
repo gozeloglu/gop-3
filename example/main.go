@@ -49,4 +49,10 @@ func main() {
 
 	r, _ := pop.Retr("1") // RETR 1 command
 	fmt.Println(r)        // array of lines. Starts with "+OK" if there is mail
+
+	d, _ := pop.Dele("1") // DELE 1 command
+	fmt.Println(d)        // response message starts with "+OK" if successful
+
+	rs, _ := pop.Rset() //RSET command
+	fmt.Println(rs)     // response message starts with "+OK" if successful
 }
