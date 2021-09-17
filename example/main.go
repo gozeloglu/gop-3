@@ -43,4 +43,7 @@ func main() {
 
 	list, _ = pop.List(1)	// LIST <arg> command
 	fmt.Println(list)				// 1st message size
+
+	n, _ := pop.Noop()	// NOOP command
+	fmt.Println(n)		// +OK
 }

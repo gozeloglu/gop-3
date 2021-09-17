@@ -274,3 +274,19 @@ func TestListWithArgUnauthorized(t *testing.T) {
 		t.Errorf("expected: %s, got: %s", e, l[0])
 	}
 }
+
+func TestNoop(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	n, err := pop.Noop()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(n, ok) {
+		t.Errorf("expected: %s, got: %s", ok, n)
+	}
+}

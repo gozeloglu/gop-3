@@ -2,7 +2,8 @@
 
 ### Post Office Protocol - Version 3 (POP3) Go Client
 
-GOP-3 (Go + POP-3) is a POP-3 client for Go. It has experimental purpose and it is still under development. [RFC 1939](https://www.ietf.org/rfc/rfc1939.txt) document has been followed while developing package.  
+GOP-3 (Go + POP-3) is a POP-3 client for Go. It has experimental purpose and it is still under
+development. [RFC 1939](https://www.ietf.org/rfc/rfc1939.txt) document has been followed while developing package.
 
 #### Features - Commands
 
@@ -47,7 +48,7 @@ func main() {
 	fmt.Println(pop.IsEncrypted())  // false
 
 	// USER command
-	username := os.Getenv("POP3_USER")  // Read from env
+	username := os.Getenv("POP3_USER") // Read from env
 	u, err := pop.User(username)
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -55,17 +56,17 @@ func main() {
 	fmt.Println(u)
 
 	// PASS command
-	password := os.Getenv("POP3_PASSWORD")  // Read from env
+	password := os.Getenv("POP3_PASSWORD") // Read from env
 	pass, err := pop.Pass(password)
 	if err != nil {
-            log.Fatalf(err.Error())	
+		log.Fatalf(err.Error())
 	}
 	fmt.Println(pass)
 
 	// STAT command
 	stat, err := pop.Stat()
 	if err != nil {
-            log.Fatalf(err.Error())
+		log.Fatalf(err.Error())
 	}
 	fmt.Println(stat)
 
@@ -82,44 +83,46 @@ func main() {
 	// DELE command
 	dele, err := pop.Dele("1")
 	if err != nil {
-            log.Fatalf(err.Error())
+		log.Fatalf(err.Error())
 	}
 	fmt.Println(dele)
 
 	// RETR command 
 	retr, err := pop.Retr("1")
 	if err != nil {
-            log.Fatalf(err.Error())
+		log.Fatalf(err.Error())
 	}
 	for _, m := range retr {
-            fmt.Println(m)
+		fmt.Println(m)
 	}
 
 	// NOOP command
 	noop, err := pop.Noop()
 	if err != nil {
-            log.Fatalf(err.Error())
+		log.Fatalf(err.Error())
 	}
 	fmt.Println(noop)
 
 	// RSET command
 	rset, err := pop.Rset()
 	if err != nil {
-            log.Fatalf(err.Error())
+		log.Fatalf(err.Error())
 	}
 	fmt.Println(rset)
 
 	// QUIT state
 	q, err := pop.Quit()
 	if err != nil {
-            log.Fatalf(err.Error())
+		log.Fatalf(err.Error())
 	}
 	fmt.Println(q) // Prints: "QUIT"
 }
 ```
 
-
 ### Run & Test
+
+**Note:** If you run the tests, you firstly need to have a mail account that enables POP3 connections. Also, you have to
+save mail address and password in your local environment.
 
 If you make changes, make sure that all tests are passed. You can run the tests with the following command.
 
@@ -133,7 +136,8 @@ If you want to run only one test, you can type the following command.
 go test pop3/* -v -run <test_function_name>
 ```
 
-Example: 
+Example:
+
 ```shell
 go test pop3/* -v -run TestStat
 ```
@@ -141,9 +145,6 @@ go test pop3/* -v -run TestStat
 ### References
 
 * [RFC 1939 POP3](https://www.ietf.org/rfc/rfc1939.txt)
-
-:warning: This package is just for testing purposes. It is not development-ready package. If you use in production, be
-careful with the package. All issues are welcome, and you can open an issue if you face any problem.
 
 ### LICENSE
 
