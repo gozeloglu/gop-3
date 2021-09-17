@@ -1,4 +1,4 @@
-# gop-3 [![GoDoc](https://godoc.org/github.com/gozeloglu/gop-3?status.svg)](https://godoc.org/github.com/gozeloglu/gop-3) [![Go Report Card](https://goreportcard.com/badge/github.com/gozeloglu/gop-3)](https://goreportcard.com/report/github.com/gozeloglu/gop-3)  [![Release](https://img.shields.io/badge/Release-v0.1.0--beta.2-blue)](https://github.com/gozeloglu/gop-3/releases) ![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/gozeloglu/gop-3?filename=go.mod) [![RFC 1939](https://img.shields.io/badge/Official%20Doc-RFC%201939-yellowgreen)](https://www.ietf.org/rfc/rfc1939.txt) ![LICENSE](https://img.shields.io/badge/license-MIT-green)
+# gop-3 [![GoDoc](https://godoc.org/github.com/gozeloglu/gop-3?status.svg)](https://godoc.org/github.com/gozeloglu/gop-3) [![Go Report Card](https://goreportcard.com/badge/github.com/gozeloglu/gop-3)](https://goreportcard.com/report/github.com/gozeloglu/gop-3)  [![Release](https://img.shields.io/badge/Release-v0.1.3--beta.2-blue)](https://github.com/gozeloglu/gop-3/releases) ![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/gozeloglu/gop-3?filename=go.mod) [![RFC 1939](https://img.shields.io/badge/Official%20Doc-RFC%201939-yellowgreen)](https://www.ietf.org/rfc/rfc1939.txt) ![LICENSE](https://img.shields.io/badge/license-MIT-green)
 
 ### Post Office Protocol - Version 3 (POP3) Go Client
 
@@ -121,7 +121,7 @@ func main() {
 
 ### Run & Test
 
-**Note:** If you run the tests, you firstly need to have a mail account that enables POP3 connections. Also, you have to
+**Note:** If you run the tests, you firstly need to have a GMail account that enables POP3 connections. Also, you have to
 save mail address and password in your local environment.
 
 If you make changes, make sure that all tests are passed. You can run the tests with the following command.

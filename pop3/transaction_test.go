@@ -1,7 +1,9 @@
 package pop3
 
 import (
+	"math"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -288,5 +290,88 @@ func TestNoop(t *testing.T) {
 
 	if !strings.HasPrefix(n, ok) {
 		t.Errorf("expected: %s, got: %s", ok, n)
+	}
+}
+
+func TestRetr(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	username := os.Getenv(userKey)
+	u, err := pop.User(username)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(u, ok) {
+		t.Errorf("expected: %s, got: %s", ok, u)
+	}
+
+	password := os.Getenv(passwordKey)
+	p, err := pop.Pass(password)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(p, ok) {
+		t.Errorf("expected: %s, got: %s", ok, p)
+	}
+
+	l, err := pop.List()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	mailNum := strings.Split(l[1], " ")[0]
+	r, err := pop.Retr(mailNum)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(r[0], ok) {
+		t.Errorf("expected prefix: %s, got %s message", ok, r[0])
+	}
+}
+
+func TestRetrFail(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	username := os.Getenv(userKey)
+	u, err := pop.User(username)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(u, ok) {
+		t.Errorf("expected: %s, got: %s", ok, u)
+	}
+
+	password := os.Getenv(passwordKey)
+	p, err := pop.Pass(password)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(p, ok) {
+		t.Errorf("expected: %s, got: %s", ok, p)
+	}
+
+	_, err = pop.List()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	r, err := pop.Retr(strconv.Itoa(math.MaxInt64 - 1))
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if !strings.HasPrefix(r[0], e) {
+		t.Errorf("expected prefix: %s, got %s message", ok, r[0])
 	}
 }

@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	c    = Client{}
+	c = Client{}
 )
 
 func TestIsAuth(t *testing.T) {
