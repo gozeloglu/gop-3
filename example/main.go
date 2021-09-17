@@ -55,4 +55,7 @@ func main() {
 
 	rs, _ := pop.Rset() //RSET command
 	fmt.Println(rs)     // response message starts with "+OK" if successful
+
+	q, _ := pop.Quit() // QUIT command
+	fmt.Println(q)     // response message starts with "+OK" if successful
 }
