@@ -64,11 +64,7 @@ func Connect(addr string, tlsConf *tls.Config, isEncryptedTLS bool) (Client, err
 // config *tls.Config -  TLS configuration for POP3 server.
 func connectPOP3TLS(addr string, config *tls.Config) (Client, error) {
 	c := &Client{
-		Conn:         nil,
-		Addr:         "",
-		greetingMsg:  "",
-		isAuthorized: false,
-		isEncrypted:  true,
+		isEncrypted: true,
 	}
 
 	tlsConn, err := tls.Dial("tcp", addr, config)
@@ -90,13 +86,7 @@ func connectPOP3TLS(addr string, config *tls.Config) (Client, error) {
 // Connect() function. Reads server's response sending
 // after connecting POP3 server.
 func connectPOP3(addr string) (Client, error) {
-	c := &Client{
-		Conn:         nil,
-		Addr:         "",
-		greetingMsg:  "",
-		isAuthorized: false,
-		isEncrypted:  false,
-	}
+	c := &Client{}
 
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
@@ -175,18 +165,14 @@ func (c *Client) quit() (string, error) {
 		return "", err
 	}
 
-	// Read the response message that comes
-	// from the server.
 	qResp, err := c.readQuitResp()
 	if err != nil {
 		return "", err
 	}
 
-	// Close the connection and change the
-	// state of the client.
 	if isQuit(qResp) {
-		defer c.Conn.Close()
-		defer c.changeClientState()
+		c.Conn.Close()
+		c.changeClientState()
 	}
 
 	return qResp, nil
@@ -211,10 +197,7 @@ func isQuit(resp string) bool {
 func (c Client) sendQuitCmd() error {
 	buf := []byte("QUIT\r\n")
 	_, err := c.Conn.Write(buf)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // readQuitResp reads the response message that comes
@@ -241,7 +224,6 @@ func (c *Client) changeClientState() {
 	c.Addr = ""
 	c.greetingMsg = ""
 	c.isAuthorized = false
-
 }
 
 // GreetingMsg returns the greeting message which

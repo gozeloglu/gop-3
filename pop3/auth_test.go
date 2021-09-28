@@ -5,9 +5,7 @@ import (
 	"testing"
 )
 
-var (
-	c = Client{}
-)
+var c = Client{}
 
 func TestIsAuth(t *testing.T) {
 	resp := "+OK Hello POP3 Server"
@@ -34,15 +32,12 @@ func TestConnect(t *testing.T) {
 	if pop.Conn == nil {
 		t.Errorf("c.Conn is nil.")
 	}
-
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-
 	if !pop.IsAuthorized() {
 		t.Errorf("Expected: %v, got: %v", true, pop.isAuthorized)
 	}
-
 	if pop.Addr != addr {
 		t.Errorf("Expected: %s, got: %s", addr, pop.Addr)
 	}
@@ -55,15 +50,12 @@ func TestConnectTLS(t *testing.T) {
 	if pop.Conn == nil {
 		t.Errorf("c.Conn is nil.")
 	}
-
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-
 	if !pop.IsAuthorized() {
 		t.Errorf("Expected: %v, got: %v", true, pop.IsAuthorized())
 	}
-
 	if pop.Addr != addr {
 		t.Errorf("Expected: %s, got: %s", addr, pop.Addr)
 	}
@@ -76,7 +68,6 @@ func TestClient_Quit(t *testing.T) {
 	if pop.Conn == nil {
 		t.Errorf("c.Conn is nil.")
 	}
-
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -85,11 +76,9 @@ func TestClient_Quit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-
 	if pop.IsAuthorized() != false {
 		t.Errorf("Expected c.IsAuthorized %v, got: %v", false, pop.IsAuthorized())
 	}
-
 	if !strings.Contains(got, ok) {
 		t.Errorf("expected %s, got %s", ok, got)
 	}
@@ -107,11 +96,9 @@ func TestClientTLS_Quit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-
 	if popTLS.IsAuthorized() != false {
 		t.Errorf("expected popTLS.IsAuthorized: %v, got: %v", false, popTLS.IsAuthorized())
 	}
-
 	if !strings.Contains(got, ok) {
 		t.Errorf("expected: %s, got: %s", ok, got)
 	}
@@ -122,7 +109,6 @@ func TestClient_IsEncrypted(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-
 	if !pop.IsEncrypted() {
 		t.Errorf("expected: %v, got: %v", true, pop.IsEncrypted())
 	}
@@ -133,7 +119,6 @@ func TestClient_IsNotEncrypted(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-
 	if pop.IsEncrypted() {
 		t.Errorf("expected: %v, got: %v", false, pop.IsEncrypted())
 	}
@@ -144,7 +129,6 @@ func TestClient_IsAuthorized(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-
 	if !pop.IsAuthorized() {
 		t.Errorf("expected: %v, got: %v", true, pop.IsAuthorized())
 	}
@@ -155,7 +139,6 @@ func TestClient_GreetingMsg(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-
 	if !strings.HasPrefix(pop.GreetingMsg(), ok) {
 		t.Errorf("expected: %s, got: %s", ok, pop.GreetingMsg())
 	}
