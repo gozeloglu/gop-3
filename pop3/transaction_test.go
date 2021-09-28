@@ -1,6 +1,7 @@
 package pop3
 
 import (
+	"log"
 	"math"
 	"os"
 	"strconv"
@@ -491,4 +492,60 @@ func TestRset(t *testing.T) {
 	if !strings.HasPrefix(r, ok) {
 		t.Errorf("expected prefix: %s, got: %s", ok, r)
 	}
+}
+
+func TestTopNegativeMsgNum(t *testing.T) {
+	exp := "-ERR message number should be greater than 0"
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	log.Println("Connection established")
+
+	msgNum := -1
+	top, err := pop.Top(msgNum, 10)
+	if top != nil {
+		t.Errorf("need to be nil")
+	}
+	if !strings.HasPrefix(err.Error(), exp) {
+		t.Errorf(err.Error())
+	}
+	log.Println(err.Error())
+
+	quit, err := pop.Quit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if !strings.HasPrefix(quit, ok) {
+		t.Errorf(quit)
+	}
+	log.Println("Connection closed")
+}
+
+func TestTopNegativeN(t *testing.T) {
+	exp := "-ERR line count cannot be negative"
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	log.Println("Connection established")
+
+	n := -1
+	top, err := pop.Top(1, n)
+	if top != nil {
+		t.Errorf("need to be nil")
+	}
+	if !strings.HasPrefix(err.Error(), exp) {
+		t.Errorf(err.Error())
+	}
+	log.Println(err.Error())
+
+	quit, err := pop.Quit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if !strings.HasPrefix(quit, ok) {
+		t.Errorf(quit)
+	}
+	log.Println("Connection closed")
 }

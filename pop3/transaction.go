@@ -1,6 +1,7 @@
 package pop3
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -394,4 +395,25 @@ func (c *Client) pass(password string) (string, error) {
 	}
 
 	return passResp, nil
+}
+
+func (c *Client) Top(msgNum, n int) ([]string, error) {
+	return c.top(msgNum, n)
+}
+
+func (c *Client) top(msgNum, n int) ([]string, error) {
+	if msgNum < 1 {
+		return nil, fmt.Errorf("%s message number should be greater than 0", e)
+	}
+	if n < 0 {
+		return nil, fmt.Errorf("%s line count cannot be negative", e)
+	}
+	cmd := "TOP"
+	arg := fmt.Sprintf("%d %d", msgNum, n)
+	err := c.sendCmdWithArg(cmd, arg)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.readRespMultiLines()
 }
