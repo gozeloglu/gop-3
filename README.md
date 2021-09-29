@@ -16,6 +16,7 @@ development. [RFC 1939](https://www.ietf.org/rfc/rfc1939.txt) document has been 
 * NOOP
 * RSET
 * QUIT
+* TOP
 
 ### Installation
 
@@ -79,6 +80,10 @@ func main() {
 	// LIST <mail-num> command
 	ll, _ := pop.List(1)
 	fmt.Println(ll[0])
+	
+	// TOP msgNum n 
+	top, _ := pop.Top(1, 10)
+	fmt.Println(top)
 
 	// DELE command
 	dele, err := pop.Dele("1")

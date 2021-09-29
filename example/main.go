@@ -44,6 +44,9 @@ func main() {
 	list, _ = pop.List(1) // LIST <arg> command
 	fmt.Println(list)     // 1st message size
 
+	top, _ := pop.Top(1, 10) // TOP msgNum n
+	fmt.Println(top)         // Headers, blank line, and top 10 line of the message body in an array
+
 	n, _ := pop.Noop() // NOOP command
 	fmt.Println(n)     // +OK
 

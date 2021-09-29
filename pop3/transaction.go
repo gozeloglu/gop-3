@@ -397,10 +397,31 @@ func (c *Client) pass(password string) (string, error) {
 	return passResp, nil
 }
 
+// Top is a command which fetches message (msgNum) with n lines. To get messages
+// from mail server, you need to authenticate. The response starts with "+OK"
+// status indicator, and it follows the multiline mail. The server sends header
+// of the message, the blank line separating the headers from the body, and then
+// the number of lines of the message's body. If you request the message line
+// number greater than the number of lines in the body, the mail server sends
+// the entire message.
+// Possible responses:
+// 		+OK message follows
+//		-ERR no such message
+// Example:
+//		C: TOP 1 10
+//		S: +OK message follows
+//		S: <headers of the message, blank line, and the first 10 lines of the body>
+//		S: .
+// 		...
+//		C: TOP 100 10
+//		S: -ERR no such message
+//
+// msgNum indicates message id starts from 1 and n is line of the message's body.
 func (c *Client) Top(msgNum, n int) ([]string, error) {
 	return c.top(msgNum, n)
 }
 
+// top is the implementation function of the Top function.
 func (c *Client) top(msgNum, n int) ([]string, error) {
 	if msgNum < 1 {
 		return nil, fmt.Errorf("%s message number should be greater than 0", e)

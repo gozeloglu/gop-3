@@ -549,3 +549,63 @@ func TestTopNegativeN(t *testing.T) {
 	}
 	log.Println("Connection closed")
 }
+
+func TestTopNotLoggedIn(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	log.Println("Connection established")
+
+	top, err := pop.Top(1, 20)
+	if err != nil {
+		t.Errorf("err need to be <nil>")
+	}
+	if !strings.HasPrefix(top[0], e) {
+		t.Errorf(top[0])
+	}
+	log.Println(top[0])
+	log.Println(err)
+}
+
+func TestTopPass(t *testing.T) {
+	pop, err := Connect(gmailTLSAddr, nil, true)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	log.Println("Connection established")
+
+	username := os.Getenv(userKey)
+	u, err := pop.User(username)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if !strings.HasPrefix(u, ok) {
+		t.Errorf("expected: %s, got: %s", ok, u)
+	}
+
+	password := os.Getenv(passwordKey)
+	p, err := pop.Pass(password)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if !strings.HasPrefix(p, ok) {
+		t.Errorf("expected: %s, got: %s", ok, p)
+	}
+
+	top, err := pop.Top(1, 20)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if !strings.HasPrefix(top[0], ok) {
+		t.Errorf(top[0])
+	}
+	log.Println(top[0])
+
+	quit, err := pop.Quit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	log.Println(quit)
+	log.Println("Connection closed")
+}
